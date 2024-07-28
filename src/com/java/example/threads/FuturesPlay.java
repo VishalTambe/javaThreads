@@ -1,4 +1,4 @@
-package com.javatutorials.threads;
+package com.java.example.threads;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,6 +20,11 @@ public class FuturesPlay {
 	}
 
 	public static void main(String[] args) {
+		
+		CompletableFuturePlay c = new CompletableFuturePlay();
+		CompletableWithCompose c1 = new CompletableWithCompose();
+		System.out.println(c.equals(c1));
+		
 		ExecutorService service = null;
 		try {
 			service = Executors.newSingleThreadExecutor();

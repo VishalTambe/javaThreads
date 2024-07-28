@@ -6,4 +6,5 @@
  *
  */
 module javaTutorials {
+	requires java.net.http;
 }
