@@ -39,9 +39,11 @@ public class StructuredTaskScopeTest {
   private static void executeTaskAndSubTask() throws InterruptedException, TimeoutException {
     try (var scope = new StructuredTaskScope<TaskResponse>()) {
 
-      // Start running the task in parallel
+      // Define the tasks
       var expTask = new RuningTask("ExpTask", 3, "100$", false);
       var hotTask = new RuningTask("HotTask", 10, "120$", false);
+
+      // Start running the task in parallel
       Subtask<TaskResponse> expSubTask = scope.fork(expTask);
       Subtask<TaskResponse> hotSubTask = scope.fork(hotTask);
 

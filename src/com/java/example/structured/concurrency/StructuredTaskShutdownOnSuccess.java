@@ -7,7 +7,7 @@ import java.util.concurrent.TimeoutException;
 
 import com.java.example.structured.concurrency.RuningTask.TaskResponse;
 
-public class StructuredTaskShutdownOnFailure {
+public class StructuredTaskShutdownOnSuccess {
 
   public static void main(String[] args)
       throws InterruptedException, TimeoutException, ExecutionException, CustomException {
@@ -21,26 +21,27 @@ public class StructuredTaskShutdownOnFailure {
 
   private static void executeTaskAndSubTask()
       throws InterruptedException, TimeoutException, ExecutionException, CustomException {
-    try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+    try (var scope = new StructuredTaskScope.ShutdownOnSuccess<TaskResponse>()) {
 
-   // Define the tasks
-      var dataTask = new RuningTask("dataTask", 3, "row", true);
-      var restTask = new RuningTask("restTask", 10, "json", false);
+      // Define the tasks
+      var weatherTask1 = new RuningTask("weather1", 3, "30", false);
+      var weatherTask2 = new RuningTask("weather2", 7, "32", false);
 
       // Start running the task in parallel
-      Subtask<TaskResponse> dataSubTask = scope.fork(dataTask);
-      Subtask<TaskResponse> restSubTask = scope.fork(restTask);
+      scope.fork(weatherTask1);
+      scope.fork(weatherTask2);
 
       // Wait for task to complete(failure or success)
       scope.join();
-      // This will throw execution exception.
-      /* scope.throwIfFailed(); */
+      // get the result from scope
+      // TaskResponse resonse = scope.result();
       // If we want to throw custome exception we can use below code
-      scope.throwIfFailed(t -> new CustomException("service_error", t.getMessage()));
+      TaskResponse resonse =
+          scope.result(t -> new CustomException("service_error", t.getMessage()));
 
       // handle the child task result
-      System.out.println(dataSubTask.get());
-      System.out.println(restSubTask.get());
+      System.out.println(resonse);
+
     }
   }
 
