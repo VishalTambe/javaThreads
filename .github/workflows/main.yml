@@ -1,1 +1,49 @@
+name: Java CI
 
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: none
+
+      - name: Compile all Java sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/classes
+          mapfile -t sources < <(find src -type f -name '*.java' -print)
+          if [ "${#sources[@]}" -eq 0 ]; then
+            echo "No Java source files were found."
+            exit 1
+          fi
+          javac --release 21 -d build/classes "${sources[@]}"
+
+      - name: Run tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t tests < <(find src -type f \( -name '*Test.java' -o -name '*Tests.java' \) -print)
+          if [ "${#tests[@]}" -eq 0 ]; then
+            echo "No test classes were found; compilation completed successfully."
+            exit 0
+          fi
+          echo "Test source files found:"
+          printf ' - %s\n' "${tests[@]}"
+          echo "Test execution requires a test runner (for example, JUnit) to be configured in the repository."
+          exit 1
